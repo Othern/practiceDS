@@ -1,6 +1,6 @@
 import numpy as np
-s1 = "abcdefgkblcd"
-s2 = "avefgdckblcddd"
+s2 = "acacbaacbcaa"
+s1 = "acbcaca"
 
 dp = np.zeros([len(s1)+1, len(s2)+1])
 for i in range(1, dp.shape[0]):

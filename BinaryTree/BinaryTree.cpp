@@ -13,6 +13,7 @@ TreeNode* create(int val){
     TreeNode* t = new TreeNode(val);
     return t;
 }
+
 void insert(TreeNode* t,int val){
     if(t == nullptr){
         t->val = val;
@@ -78,7 +79,13 @@ void swapT(TreeNode* t){
     swapT(t->left);
     swapT(t->right);
 }
-
+bool isSame(TreeNode* t1, TreeNode* t2){
+    if(t1 == nullptr && t2 == nullptr) return true;
+    if(t1 == nullptr && t2 != nullptr) return false;
+    if(t1 != nullptr && t2 == nullptr) return false;
+    if(t1 -> val != t2 -> val) return false;
+    return isSame(t1->left, t2->left) && isSame(t1->right, t2->right);
+}
 TreeNode* find(TreeNode* t,int val){
     if(t == nullptr) return nullptr;
     if(t -> val == val) return t;
