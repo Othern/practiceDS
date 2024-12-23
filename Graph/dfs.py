@@ -1,9 +1,9 @@
 import numpy as np
-
+import pandas as pd
 class Graph:
-    def __init__(self, adjList):
+    def __init__(self, adjList:dict):
         self.adjList = adjList
-        self.vertices = {v: {"color": "white", "d": None, "pi": None} for v in adjList}
+        self.vertices = {v: {"color": "white", "d": None, "pi": None, "f": None} for v in adjList}
         self.time = 0
 
     def resetVisit(self):
@@ -30,9 +30,9 @@ class Graph:
             if self.vertices[v]["color"] == "white":
                 self.vertices[v]["pi"] = u
                 self._dfs_visit(v)
-        
-        self.vertices[u]["color"] = "black"
         self.time += 1
+        self.vertices[u]["color"] = "black"
+        self.vertices[u]["f"] = self.time
         print(f"Finish {u}, end time: {self.time}")  # Output node finish info
     
     def isCycle(self):
@@ -57,11 +57,51 @@ class Graph:
                 self.vertices[v]["pi"] = u
                 if self._isCycle_visit(v, u):
                     return True
-        
-        self.vertices[u]["color"] = "black"
         self.time += 1
+        self.vertices[u]["color"] = "black"
+        self.vertices[u]["f"] = self.time
         print(f"Finish {u}, end time: {self.time}")  # Output node finish info
     
+    def transposeGraph(self):
+        adjListT = { key: [] for key in self.adjList.keys()}
+        for key,neighbors in zip(self.adjList.keys(),self.adjList.values()):
+            for neighbor in neighbors:
+                adjListT[neighbor].append(key)
+        return Graph(adjListT)
+    
+    def getSCC(self):
+        # Step 1: Perform DFS on the original graph to compute finish times
+        self.dfs()
+
+        # Step 2: Transpose the graph
+        graphT = self.transposeGraph()
+
+        # Step 3: Sort vertices by finish time in descending order
+        vertices_df = pd.DataFrame(self.vertices).T
+        sorted_vertices = vertices_df.sort_values("f", ascending=False).index.tolist()
+
+        # Step 4: Perform DFS on the transposed graph in the order of sorted_vertices
+        graphT.resetVisit()  # Reset visitation state for the transposed graph
+        scc = []  # List to hold all strongly connected components
+
+        for vertex in sorted_vertices:
+            if graphT.vertices[vertex]["color"] == "white":
+                component = []
+                graphT._collect_scc(vertex, component)
+                scc.append(component)
+
+        return scc
+    
+    # Helper method for collecting nodes in a single strongly connected component.
+    def _collect_scc(self, u, component):
+        self.vertices[u]["color"] = "gray"
+        component.append(u)
+
+        for v in self.adjList[u]:
+            if self.vertices[v]["color"] == "white":
+                self._collect_scc(v, component)
+
+        self.vertices[u]["color"] = "black"
     
             
 # Example graph with a cycle
@@ -80,12 +120,24 @@ adjList_no_cycle = {
     'C': ['A'],
     'D': ['B']
 }
+adjList_direct = {
+    "a": ["b"],
+    "b": ["c", "e", "f"],
+    "c": ["d", "g"],
+    "d": ["c", "h"],
+    "e": ["a", "f"],
+    "f": ["g"],
+    "g": ["f"],
+    "h": ["d", "g"],
+}
 
 g1 = Graph(adjList_with_cycle)
 g2 = Graph(adjList_no_cycle)
+g3 = Graph(adjList_direct)
 
 print("Graph with cycle:")
 print(g1.isCycle())  # Output: True
 
 print("\nGraph without cycle:")
 print(g2.isCycle())  # Output: False
+print(g3.getSCC())
