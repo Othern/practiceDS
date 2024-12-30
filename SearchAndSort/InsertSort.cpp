@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 using namespace std;
 
 struct Node {
@@ -6,7 +7,7 @@ struct Node {
     Node* next;
 };
 
-void InsertSort(Node* head){
+void InsertionSortLinkList(Node* head){
     if (!head || !head->next) return; // No need to sort if list is empty or has one element.
     Node* sorted = nullptr; // Start with an empty sorted list.
     Node* curr = head;
@@ -34,6 +35,26 @@ void InsertSort(Node* head){
     head = sorted; // Update the head to the new sorted list.
 }
 
+void Insert(vector<int>& data, int key){
+    int val = data[key];
+    int i = key - 1;
+    // 如果用小於等於，則此insertion sort會變的unstable
+    while(val < data[i] && i >=0){
+        data[i + 1] = data[i];
+        i--;
+    }
+    data[i + 1] = val;
+    // for(int i =0; i<data.size(); i++) cout << data[i] << " ";
+    // cout << endl;    
+    return;
+}
+
+void InsertionSortArray(vector<int>& data){
+    for(int i = 1; i < data.size(); i++){
+        Insert(data,i);
+    }
+}
+
 void PrintLinkedList(Node* head){
     Node* curr = head;
     while(curr != nullptr){
@@ -44,11 +65,13 @@ void PrintLinkedList(Node* head){
 }
 
 int main(){
-    int x[] = {1, 2, 23, 4, 3, 29, 5, 8 , 10, 7, 32};
-    int n = 11;
+    int x[] = {1, 2, 23, 4, 3, 29, 5, 8 , 10, 7, 32, 8};
+    vector<int> data;
+    int n = 12;
     Node* curr = new Node();
     Node* dummy = curr;
     for(int i = 0; i <n; i++){
+        data.push_back(x[i]);
         Node* next = new Node();
         next -> val = x[i];
         curr -> next = next;
@@ -56,7 +79,10 @@ int main(){
     } 
     Node* head = dummy -> next;
     PrintLinkedList(head);
-    InsertSort(head);
+    InsertionSortLinkList(head);
     PrintLinkedList(head);
+    InsertionSortArray(data);
+    for(int i =0; i<n; i++) cout << data[i] << " ";
+    cout << endl;
     return 0;
 }
