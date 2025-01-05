@@ -35,9 +35,7 @@ void InsertionSortLinkList(Node* head){
     head = sorted; // Update the head to the new sorted list.
 }
 
-void Insert(vector<int>& data, int key){
-    int val = data[key];
-    int i = key - 1;
+void Insert(vector<int>& data,int val, int i){
     // 如果用小於等於，則此insertion sort會變的unstable
     while(val < data[i] && i >=0){
         data[i + 1] = data[i];
@@ -48,10 +46,37 @@ void Insert(vector<int>& data, int key){
     // cout << endl;    
     return;
 }
+// 二分搜索查找插入位置
+int BinarySearch(const vector<int>& data, int val, int low, int high) {
+    while (low <= high) {
+        int mid = low + (high - low) / 2;
+        if (data[mid] < val) {
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
+    }
+    return low; // 返回插入位置
+}
+void BinaryInsert(vector<int>& data, int val, int i) {
+    // 使用二分搜索查找插入位置
+    int pos = BinarySearch(data, val, 0, i);
+    
+    // 将 [pos, i] 范围的元素向右移动
+    for (int j = i; j >= pos; j--) {
+        data[j + 1] = data[j];
+    }
+    
+    // 在 pos 位置插入值
+    data[pos] = val;
+    
+    return;
+}
 
 void InsertionSortArray(vector<int>& data){
     for(int i = 1; i < data.size(); i++){
-        Insert(data,i);
+        //BinaryInsert(data,data[i],i-1);
+        Insert(data,data[i],i-1);
     }
 }
 
