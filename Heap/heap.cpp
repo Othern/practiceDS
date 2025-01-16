@@ -9,21 +9,21 @@ class minHeap {
         void adjust(int idx){
             int n = data.size();
             int x = data[idx];
+            int minChildIdx = 2 * idx + 1;
 
-            while (2 * idx + 1 < n) { // Ensure the current node has at least one child
-                int minChildIdx = 2 * idx + 1; // Left child
+            while (minChildIdx < n) { // Ensure the current node has at least one child
                 if (minChildIdx + 1 < n && data[minChildIdx + 1] < data[minChildIdx]) {
                     minChildIdx++; // Use the smaller child
                 }
                 if (data[minChildIdx] < x) {
-                    data[idx] = data[minChildIdx]; // Move smaller child up
-                    idx = minChildIdx;            // Move to the child position
+                    data[(minChildIdx-1)/2] = data[minChildIdx]; // Move smaller child up
+                    minChildIdx = 2 * minChild +1;            // Move to the child position
                 } else {
                     break; // Heap property is restored
                 }
             }
 
-            data[idx] = x; // Pla
+            data[(minChildIdx-1)/2] = x; // Pla
         }
 
     public:
