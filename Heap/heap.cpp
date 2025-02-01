@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <iomanip>
 #include <unordered_map>
 using namespace std;
 
@@ -7,23 +8,18 @@ class minHeap {
     private:
         vector<int> data;
         void adjust(int idx){
-            int n = data.size();
-            int x = data[idx];
-
-            while (2 * idx + 1 < n) { // Ensure the current node has at least one child
-                int minChildIdx = 2 * idx + 1; // Left child
-                if (minChildIdx + 1 < n && data[minChildIdx + 1] < data[minChildIdx]) {
-                    minChildIdx++; // Use the smaller child
+            int n = data.size()-1;
+            int k = data[idx];
+            int child = idx * 2  + 1;
+            while(child <= n){
+                if(child + 1 <= n && data[child + 1] < data[child]) child++;
+                if(data[child] < k){
+                    data[ (child-1) / 2] = data[child];
+                    child = child * 2 + 1;
                 }
-                if (data[minChildIdx] < x) {
-                    data[idx] = data[minChildIdx]; // Move smaller child up
-                    idx = minChildIdx;            // Move to the child position
-                } else {
-                    break; // Heap property is restored
-                }
+                else break;
             }
-
-            data[idx] = x; // Pla
+            data[(child-1) / 2] = k;
         }
 
     public:
@@ -52,11 +48,41 @@ class minHeap {
                 adjust(i);
             }
         }
-
-
-        void print(){
-            for(int i=0; i< data.size(); i++) cout << data[i] << " ";
+        void printMin(){
+            cout << data[0];
         }
+        void delMin(){
+            data[0] = data[data.size()-1];
+            data.pop_back();
+            adjust(0);
+        }
+        void print() {
+        int n = data.size();
+        if (n == 0) {
+            cout << "Tree is empty." << endl;
+            return;
+        }
+
+        int levels = log2(n) + 1;  // 計算樹的高度
+
+        int index = 0;  // 追蹤當前處理的節點索引
+
+        for (int level = 0; level < levels; ++level) {
+            int numNodes = pow(2, level);  // 該層的節點數
+            int maxSpacing = pow(2, levels - level) - 1;  // 層級間距計算
+
+            // 前導空格，確保整體對齊
+            cout << string(maxSpacing / 2, ' ');
+
+            for (int i = 0; i < numNodes && index < n; ++i, ++index) {
+                cout << setw(2) << data[index];  // 設定數字寬度，確保對齊
+                if (i < numNodes - 1) {
+                    cout << string(maxSpacing, ' ');  // 設定間距
+                }
+            }
+            cout << endl;
+        }
+    }
 
        
 };
@@ -78,6 +104,9 @@ int main(){
 
     minHeap h;
     h.buildHeapFromVector(input);
+    h.print();
+    cout << endl << "---------- After extract min value --------- " << endl;
+    h.delMin();
     h.print();
     return 0;
 }
